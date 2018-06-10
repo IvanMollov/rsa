@@ -5,112 +5,90 @@
 #include <queue>
 
 #include <thread>
+#include <mutex>
+
 #include <fstream>
 
-class FrequencyTable
+#include <cstddef>
+#include <cmath>
+
+#include <iostream>
+
+namespace FrequencyTable
 {
-public:
-	FrequencyTable() = delete;
-	FrequencyTable(const std::string& file_path)
+	static const std::size_t FREQUENCY_TABLE_SIZE = 256;
+	using Type = std::array<unsigned long long, FREQUENCY_TABLE_SIZE + 1>;
+
+	void process(const std::string* file_path, std::streampos from, std::streampos to, Type* frequencies)
 	{
-		set_file_path(file_path);
-		_frequencies.fill(0);
+		std::ifstream in(*file_path, std::ios::in | std::ios::binary);
+
+		if (in.is_open()) {
+			in.seekg(from);
+			if (in.good()) {
+				const std::size_t BUFFER_SIZE = 1024;
+				char* buffer = new char[BUFFER_SIZE];
+
+				while (in.good() && in.tellg() < to) {
+					auto b = in.tellg();
+					in.read(buffer, BUFFER_SIZE);
+					auto a = std::min(in.gcount(), to - b + 1);
+					for (std::size_t i = 0; i < a; ++i) {
+						const unsigned char symbol_index = static_cast<const unsigned char>(buffer[i]);
+
+						frequencies->at(symbol_index) += 1; 
+						frequencies->at(256) += 1;
+					}
+				}	
+
+				delete[] buffer;
+			}
+
+			in.close();
+		}
 	}
 
-	FrequencyTable(const FrequencyTable&) = delete;
-	FrequencyTable(const FrequencyTable&&) = delete;
-
-	~FrequencyTable()
+	inline Type get(const std::string& file_path, unsigned int threads_count)
 	{
-		join_workers();
-	}
+		std::vector<Type*> frequencies;
 
-public:
-	FrequencyTable& operator=(const FrequencyTable&) = delete;
-	FrequencyTable& operator=(const FrequencyTable&&) = delete;
-
-public:
-	std::string get_file_path() const
-	{
-		return _file_path;
-	}
-	void set_file_path(const std::string& file_path)
-	{
-		_file_path = file_path;
-		_is_updated = false;
-	}
-
-	std::array<unsigned long long, 255> get_frequencies() const
-	{
-		if (!_is_updated) {
-			FrequencyTable* self = const_cast<FrequencyTable*>(this);
-			self->generate_table();
-			self->join_workers();
-
-			_is_updated = true;
+		std::streampos file_size = -1;
+		std::ifstream file(file_path, std::ifstream::in | std::ifstream::binary | std::ifstream::ate);
+		if (file.is_open()) {
+			file_size = file.tellg();
+			file.close();
 		}
 
-		return _frequencies;
-	}
+		const std::streampos segment_size = static_cast<const std::streampos>(std::ceil(file_size / static_cast<double>(threads_count)));
 
-private:
-	void generate_table()
-	{
-		std::ifstream file;
-		file.open(_file_path, std::ios::in | std::ios::binary);
+		std::vector<std::thread> workers;
+		for (std::streampos segment_start = 0; segment_start < file_size; segment_start += segment_size + static_cast<std::streampos>(1)) {
+			segment_start = segment_start <= file_size ? segment_start : file_size;
+			//std::streampos segment_end = 62;
+			std::streampos segment_end = segment_start + segment_size;
+			segment_end = segment_end <= file_size ? segment_end : file_size;
 
-		if (file.is_open()) {
-			while (!file.eof()) {
-				const std::streamsize BUFFER_SIZE = 8192;
-				char buffer[BUFFER_SIZE];
+			frequencies.push_back(new Type());
+			frequencies.back()->fill(0);
 
-				file.read(buffer, sizeof(buffer));
-				std::streamsize read_size = file.gcount();
+			workers.push_back(std::thread(process, &file_path, segment_start, segment_end, frequencies.back()));
 
-				//process(buffer, read_size);
-
-				//std::thread worker([=]() { 
-				//	this->process(std::move(buffer), read_size); 
-				//});
-				//worker.detach();
-
-				//std::thread worker([=]() { 
-				//	this->process(std::move(buffer), read_size);
-				//});
-				//if (worker.joinable())
-				//	worker.join();
-
-				_workers.push_back(std::thread([=]() { 
-					this->process(buffer, read_size);
-				}));
+			//process(&file_path, segment_start, segment_end, frequencies.back());
+		}
+		for (std::thread& worker : workers) {
+			if (worker.joinable()) {
+				worker.join();
 			}
 		}
 
-		file.close();
-	}
-
-	void process(const char buffer[], std::streamsize size)
-	{
-		for (size_t i = 0; i < size; ++i) {
-			const unsigned char current_symbol = static_cast<const unsigned char>(buffer[i]);
-			_frequencies[current_symbol] += 1;
-		}
-	}
-
-	void join_workers()
-	{
-		for (auto& worker : _workers) {
-			while (!worker.joinable());
-			worker.join();
+		Type frequency_all;
+		frequency_all.fill(0);
+		for (auto ft : frequencies) {
+			for (std::size_t i = 0; i < ft->size(); ++i) {
+				frequency_all.at(i) += ft->at(i);
+			}
 		}
 
-		_workers.clear();
+		return frequency_all;
 	}
-
-private:
-	std::string _file_path;
-	std::array<unsigned long long, 255> _frequencies;
-	std::vector<std::thread> _workers;
-
-	mutable bool _is_updated;
-};
+}
