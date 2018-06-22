@@ -51,7 +51,7 @@ namespace Utils
 	{
 		Time now()
 		{
-			return std::chrono::high_resolution_clock::now();
+			return static_cast<Time>(std::chrono::high_resolution_clock::now());
 		}
 
 		Duration since(const Time& start)
