@@ -38,6 +38,7 @@ App* App::get_instance(const std::vector<std::string>& arguments, Log& output, L
 		instance->_log << "Setting threads count to maximum threads available!" << "\n";
 
 		instance->_threads = thread::hardware_concurrency();
+		instance->_log << "Threads count: " << instance->_threads << "\n";
 	}
 
 	bool file_specified = Utils::OptionUtils::has_option(get_option(FILE).short_option, arguments);
@@ -54,13 +55,18 @@ App* App::get_instance(const std::vector<std::string>& arguments, Log& output, L
 		}
 	}
 	else if (!instance->_help) {
+		instance->_error_log << "File not specified " << "\n";
+
 		return instance = nullptr;
 	}
 
 	assert(instance);
 
-	if (!App::is_valid(instance))
+	if (!App::is_valid(instance)) {
+		instance->_error_log << "Application could not be started with specified data!" << "\n";	
+		
 		instance = nullptr;
+	}
 
 	return instance;
 }
