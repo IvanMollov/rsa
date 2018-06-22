@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
 #include <fstream>
+#include <algorithm>
 #include <stdexcept>
 
 namespace Utils
