@@ -21,7 +21,7 @@ namespace Utils
 
 	namespace TimeUtils
 	{
-		using Time = std::chrono::time_point<std::chrono::steady_clock>;
+		using Time = std::chrono::high_resolution_clock::time_point;
 		using Duration = std::chrono::duration<double>;
 
 		Time now();
