@@ -86,14 +86,14 @@ void App::execute() const
 
 		unsigned int threads_count = are_threads_specified() ? _threads : std::thread::hardware_concurrency();
 		try {
-			ft = FrequencyTable::get(_file, threads_count, _log);
+			ft = FrequencyTable::get_frequency_table(_file, threads_count, _log);
 		}
 		catch (const exception& e) {
 			_error_log << e.what() << "\n";
 		}
 
 		if (_print)
-			FrequencyTable::print(_output, ft);
+			FrequencyTable::print_frequency_table(_output, ft);
 	}
 }
 

@@ -62,7 +62,7 @@ namespace FrequencyTable
 		return merged_frequencies;
 	}
 
-	FrequencyTableType get(const std::string& file_path, unsigned int threads_count, Log& log)
+	FrequencyTableType get_frequency_table(const std::string& file_path, unsigned int threads_count, Log& log)
 	{
 		std::streampos file_size = Utils::FileUtils::get_file_size(file_path);
 		// segment the file in equal parts among every worker thread
@@ -103,9 +103,9 @@ namespace FrequencyTable
 			{
 				workers[i].join();
 
-				log << "Thread #" << i << " stopped." << "\n";
+				log << "Thread #" << i << " stopped." << ". ";
 				Utils::TimeUtils::Duration elapsed = Utils::TimeUtils::since(started_times[i]);
-				log << "Thread #" << i << " execution time was " << elapsed.count() << "s." << "\n";
+				log << "Execution time was " << elapsed.count() << "s." << "\n";
 			}
 		}
 
@@ -113,7 +113,7 @@ namespace FrequencyTable
 		return merge_frequencies(frequency_tables);
 	}
 
-	void print(Log& out, const FrequencyTableType& ft)
+	void print_frequency_table(Log& out, const FrequencyTableType& ft)
 	{
 		for (size_t i = 0; i < ft.size() - 1; ++i) {
 			if (ft[i] != 0) {
