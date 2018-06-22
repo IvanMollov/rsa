@@ -1,17 +1,13 @@
-#pragma once
+#include "utils.hpp"
 
 #include <fstream>
-
-#include <string>
-#include <vector>
-
 #include <stdexcept>
 
 namespace Utils
 {
-	namespace File
+	namespace Files
 	{
-		inline std::streampos get_file_size(const std::string& file_path)
+		std::streampos get_file_size(const std::string& file_path)
 		{
 			std::streampos file_size = -1;
 
@@ -23,7 +19,15 @@ namespace Utils
 
 			return file_size;
 		}
-	} // !File
+		bool can_open(const std::string& file_path)
+		{
+			std::ifstream file(file_path, std::ifstream::in | std::ifstream::binary);
+			bool opened = file.is_open();
+
+			file.close();
+			return opened;
+		}
+	} // !Files
 
 	namespace Options
 	{
@@ -42,4 +46,18 @@ namespace Utils
 			throw std::invalid_argument(option + " -- Option not found!");
 		}
 	} // !Options
+
+	namespace Time
+	{
+		Time now()
+		{
+			return std::chrono::high_resolution_clock::now();
+		}
+
+		Duration since(const Time& start)
+		{
+			Time finish = now();
+			return finish - start;
+		}
+	} // !Times
 } // !Utils
