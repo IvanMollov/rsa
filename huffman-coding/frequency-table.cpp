@@ -64,7 +64,7 @@ namespace FrequencyTable
 
 	FrequencyTableType get(const std::string& file_path, unsigned int threads_count, Log& log)
 	{
-		std::streampos file_size = Utils::Files::get_file_size(file_path);
+		std::streampos file_size = Utils::FileUtils::get_file_size(file_path);
 		// segment the file in equal parts among every worker thread
 		const std::streampos segment_size = static_cast<const std::streampos>(std::ceil(static_cast<double>(file_size) / static_cast<double>(threads_count)));
 
@@ -74,7 +74,7 @@ namespace FrequencyTable
 		// TODO: less detached from one another
 		std::vector<FrequencyTableType> frequency_tables(threads_count);
 		std::vector<std::thread> workers(threads_count);
-		std::vector<Utils::Time::Time> started_times(threads_count);
+		std::vector<Utils::TimeUtils::Time> started_times(threads_count);
 
 		// start processing each segment in a new worker thread and in a new frequency table
 		for (unsigned int i = 0; i < threads_count; ++i) {
@@ -87,7 +87,7 @@ namespace FrequencyTable
 			frequency_tables[i].fill(0);
 			assert(frequency_tables.size() <= threads_count);
 
-			started_times[i] = Utils::Time::now();
+			started_times[i] = Utils::TimeUtils::now();
 			assert(started_times.size() <= threads_count);
 
 			log << "Thread #" << i << " started." << "\n";
@@ -104,7 +104,7 @@ namespace FrequencyTable
 				workers[i].join();
 
 				log << "Thread #" << i << " stopped." << "\n";
-				Utils::Time::Duration elapsed = Utils::Time::since(started_times[i]);
+				Utils::TimeUtils::Duration elapsed = Utils::TimeUtils::since(started_times[i]);
 				log << "Thread #" << i << " execution time was " << elapsed.count() << "s." << "\n";
 			}
 		}

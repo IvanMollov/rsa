@@ -7,19 +7,19 @@
 
 namespace Utils
 {
-	namespace Files
+	namespace FileUtils
 	{
 		std::streampos get_file_size(const std::string& file_path);
 		bool can_open(const std::string& file_path);
-	} // !Files
+	} // !FileUtils
 
-	namespace Options
+	namespace OptionUtils
 	{
 		bool has_option(const std::string& option, const std::vector<std::string>& arguments);
 		std::string get_option_value(const std::string& option, const std::vector<std::string>& arguments);
-	} // !Options
+	} // !OptionUtils
 
-	namespace Time
+	namespace TimeUtils
 	{
 		using Time = std::chrono::time_point<std::chrono::steady_clock>;
 		using Duration = std::chrono::duration<double>;

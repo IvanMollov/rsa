@@ -9,7 +9,7 @@ int main(int argc, const char* argv[])
 {
 	using namespace std;
 	
-	auto start = Utils::Time::now();
+	auto start = Utils::TimeUtils::now();
 
 	vector<string> arguments;
 	arguments.assign(argv, argv + argc);
@@ -26,10 +26,10 @@ int main(int argc, const char* argv[])
 
 	output << "Total threads count: " << app->get_threads_count() << "\n";
 	//cout << "Bytes processed count: " << ft[256] << endl;
-	streampos file_size = Utils::Files::get_file_size(app->get_file_path());
+	streampos file_size = Utils::FileUtils::get_file_size(app->get_file_path());
 	output << "File size: " << file_size << "\n";
 
-	auto elapsed = Utils::Time::since(start);
+	auto elapsed = Utils::TimeUtils::since(start);
 	output << "Total execution time: " << elapsed.count() << "s" << "\n";
 
 	return 0;

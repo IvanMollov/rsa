@@ -11,9 +11,9 @@ App* App::get_instance(const std::vector<std::string>& arguments, Log& output, L
 
 	App* instance = new App(output, log, error_log);
 
-	instance->_help = Utils::Options::has_option(get_option(HELP).short_option, arguments);
-	instance->_quiet = Utils::Options::has_option(get_option(QUIET).short_option, arguments);
-	instance->_print = Utils::Options::has_option(get_option(PRINT).short_option, arguments);
+	instance->_help = Utils::OptionUtils::has_option(get_option(HELP).short_option, arguments);
+	instance->_quiet = Utils::OptionUtils::has_option(get_option(QUIET).short_option, arguments);
+	instance->_print = Utils::OptionUtils::has_option(get_option(PRINT).short_option, arguments);
 
 	if (instance->_quiet) {
 		instance->_error_log.set_quiet(instance->_quiet);
@@ -21,9 +21,9 @@ App* App::get_instance(const std::vector<std::string>& arguments, Log& output, L
 		instance->_log.set_quiet(instance->_quiet);
 	}
 
-	instance->_threads_specified = Utils::Options::has_option(get_option(THREADS).short_option, arguments);
+	instance->_threads_specified = Utils::OptionUtils::has_option(get_option(THREADS).short_option, arguments);
 	if (instance->_threads_specified) {
-		string threads_string = Utils::Options::get_option_value(get_option(THREADS).short_option, arguments);
+		string threads_string = Utils::OptionUtils::get_option_value(get_option(THREADS).short_option, arguments);
 		try {
 			instance->_threads = stoi(threads_string);
 		}
@@ -40,10 +40,10 @@ App* App::get_instance(const std::vector<std::string>& arguments, Log& output, L
 		instance->_threads = thread::hardware_concurrency();
 	}
 
-	bool file_specified = Utils::Options::has_option(get_option(FILE).short_option, arguments);
+	bool file_specified = Utils::OptionUtils::has_option(get_option(FILE).short_option, arguments);
 	if (file_specified) {
-		string file_path = Utils::Options::get_option_value(get_option(FILE).short_option, arguments);
-		bool can_open = Utils::Files::can_open(file_path);
+		string file_path = Utils::OptionUtils::get_option_value(get_option(FILE).short_option, arguments);
+		bool can_open = Utils::FileUtils::can_open(file_path);
 		if (can_open) {
 			instance->_file = file_path;
 		}
@@ -140,5 +140,5 @@ App::Option App::get_option(OptionID id)
 
 bool App::is_valid_file_path() const
 {
-	return Utils::Files::can_open(_file);
+	return Utils::FileUtils::can_open(_file);
 }

@@ -5,7 +5,7 @@
 
 namespace Utils
 {
-	namespace Files
+	namespace FileUtils
 	{
 		std::streampos get_file_size(const std::string& file_path)
 		{
@@ -27,9 +27,9 @@ namespace Utils
 			file.close();
 			return opened;
 		}
-	} // !Files
+	} // !FileUtils
 
-	namespace Options
+	namespace OptionUtils
 	{
 		bool has_option(const std::string& option, const std::vector<std::string>& arguments)
 		{
@@ -45,9 +45,9 @@ namespace Utils
 
 			throw std::invalid_argument(option + " -- Option not found!");
 		}
-	} // !Options
+	} // !OptionUtils
 
-	namespace Time
+	namespace TimeUtils
 	{
 		Time now()
 		{
@@ -59,5 +59,5 @@ namespace Utils
 			Time finish = now();
 			return finish - start;
 		}
-	} // !Times
+	} // !TimeUtils
 } // !Utils
