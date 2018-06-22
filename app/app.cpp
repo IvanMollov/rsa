@@ -3,6 +3,8 @@
 #include "../utils/utils.hpp"
 #include "../huffman-coding/frequency-table.hpp"
 
+#include <thread>
+
 App* App::get_instance(const std::vector<std::string>& arguments, Log& output, Log& log, Log& error_log)
 {
 	using namespace std;
