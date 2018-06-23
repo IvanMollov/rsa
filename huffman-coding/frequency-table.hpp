@@ -9,7 +9,7 @@
 
 namespace FrequencyTable
 {
-	static const size_t FREQUENCY_TABLE_SIZE = 256;
+	static const size_t FREQUENCY_TABLE_SIZE = std::numeric_limits<const unsigned char>::max() + 1;
 	using FrequencyTableType = std::array<unsigned long long, FREQUENCY_TABLE_SIZE>;
 
 	FrequencyTableType get_frequency_table(const std::string& file_path, unsigned int threads_count, Log& log);

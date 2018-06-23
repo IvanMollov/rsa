@@ -24,12 +24,12 @@ public:
 	template <typename MessegeType>
 	Log& operator<<(const MessegeType& messege) 
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-
-		assert(_log);
-		std::ostream& log = *_log;
-		
 		if (!_is_quiet) {
+			std::lock_guard<std::mutex> lock(_mutex);
+
+			assert(_log);
+			std::ostream& log = *_log;
+		
 			log << messege;
 		}
 

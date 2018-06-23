@@ -66,7 +66,7 @@ namespace FrequencyTable
 	{
 		std::streampos file_size = Utils::FileUtils::get_file_size(file_path);
 		// segment the file in equal parts among every worker thread
-		const std::streampos segment_size = static_cast<const std::streampos>(std::ceil(static_cast<double>(file_size) / static_cast<double>(threads_count)));
+		const std::streampos segment_size = std::ceil(static_cast<double>(file_size) / static_cast<double>(threads_count));
 
 		// frequency_tables[k] is the frequency table 
 		// over which worker[k] started working
