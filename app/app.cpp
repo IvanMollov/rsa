@@ -123,9 +123,9 @@ bool App::is_valid(const App* instance)
 	bool valid = true;
 	if (help && (file || threads || print))
 		valid = false;
-	else if (!file)
+	else if (!help && !file)
 		valid = false;
-	else if (print && quiet)
+	else if (print && quiet || help && quiet)
 		valid = false;
 
 	return valid;
@@ -135,10 +135,10 @@ App::Option App::get_option(OptionID id)
 {
 	static const std::vector<Option> options = {
 		{ "-f", "--file",    "path to a file // REQUIRED" },
-	{ "-t", "--threads", "number of threads to start // if not specified - maximal non hardware concurent" },
-	{ "-p", "--print",   "prints the frequency table" },
-	{ "-q", "--quiet",   "runs with no output" },
-	{ "-h", "--help",    "shows information for the program" }
+		{ "-t", "--threads", "number of threads to start // if not specified - maximal non hardware concurent" },
+		{ "-p", "--print",   "prints the frequency table" },
+		{ "-q", "--quiet",   "runs with no output" },
+		{ "-h", "--help",    "shows information for the program" }
 	};
 
 	return options[id];
